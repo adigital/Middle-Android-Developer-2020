@@ -13,7 +13,7 @@ object UserHolder {
 
     fun registerUserByPhone(fullName: String, phone: String): User =
         User.makeUser(fullName, null, null, phone = checkLogin(phone)).also { user ->
-            if (map.containsKey(user.login)) throw IllegalArgumentException("A user with this email already exists")
+            if (map.containsKey(user.login)) throw IllegalArgumentException("A user with this phone already exists")
             else map[user.login] = user
         }
 
