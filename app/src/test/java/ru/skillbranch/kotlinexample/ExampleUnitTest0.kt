@@ -3,8 +3,6 @@ package ru.skillbranch.kotlinexample
 import org.junit.Assert
 import org.junit.Test
 
-import org.junit.Assert.*
-import ru.skillbranch.kotlinexample.utils.Utils
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -33,12 +31,6 @@ class ExampleUnitTest0 {
         val successResult =  holder.loginUser("+7 (917) 971-11-11", user.accessCode!!)
 
         println(successResult)
-    }
-
-    @Test
-    fun test2() {
-        val fullName = Utils.parseFullName("John Doe")
-        println("${fullName.first} ${fullName.second}")
     }
 
     @Test

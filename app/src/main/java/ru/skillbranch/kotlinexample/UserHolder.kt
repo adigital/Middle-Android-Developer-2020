@@ -1,7 +1,6 @@
 package ru.skillbranch.kotlinexample
 
 import androidx.annotation.VisibleForTesting
-import ru.skillbranch.kotlinexample.utils.Utils.parseFullName
 
 object UserHolder {
     private val map = mutableMapOf<String, User>()
@@ -64,5 +63,13 @@ object UserHolder {
          }
 
         return map.values.toMutableList()
+    }
+
+    private fun parseFullName(fullName: String?): Pair<String, String?>{
+        val parts: List<String>? = fullName?.split(" ")
+        val firstName = parts?.getOrNull(0)?.takeUnless { it.isEmpty() }.apply { this }
+        val lastName = parts?.getOrNull(1)?.takeUnless { it.isEmpty() }.apply { this }
+
+        return firstName.toString() to lastName
     }
 }
