@@ -1,6 +1,7 @@
 package ru.skillbranch.kotlinexample
 
 import androidx.annotation.VisibleForTesting
+import ru.skillbranch.kotlinexample.utils.Utils.parseFullName
 
 object UserHolder {
     private val map = mutableMapOf<String, User>()
@@ -44,5 +45,24 @@ object UserHolder {
                return login.replace("""[^+\d]""".toRegex(), "")
             }
         }
+    }
+
+    fun importUsers(list: List<String>): List<User>? {
+         list.forEach {
+             val line = it.split(';')
+
+             val fullName = parseFullName(line[0].trim())
+             val email = line[1].ifEmpty {  null }
+             val salt = line[2].split(':')[0].ifEmpty { null }
+             val hash = line[2].split(':')[1].ifEmpty { null }
+             val phone = line[3].ifEmpty {  null }
+
+             val user = User(fullName.first, fullName.second, email, salt, hash, phone)
+
+             if (map.containsKey(user.login)) throw IllegalArgumentException("A user with this login already exists")
+             else map[user.login] = user
+         }
+
+        return map.values.toMutableList()
     }
 }

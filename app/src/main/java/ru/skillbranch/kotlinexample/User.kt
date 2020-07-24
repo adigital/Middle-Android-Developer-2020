@@ -65,6 +65,20 @@ class User private constructor(
         sendAccessCodeToUser(rawPhone, code)
     }
 
+    // For csv
+    constructor(
+        firstName: String,
+        lastName: String?,
+        email: String?,
+        saltIn: String?,
+        hash: String?,
+        rawPhone: String?
+    ) : this(firstName, lastName, email = email, rawPhone = rawPhone, meta = mapOf("src" to "csv")) {
+        println("Secondary list constructor")
+        salt = saltIn
+        passwordHash = hash!!
+    }
+
     init {
         println("First init block, primary constructor was called")
 
