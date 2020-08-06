@@ -2,6 +2,7 @@ package ru.skillbranch.kotlinexample
 
 import org.junit.Assert
 import org.junit.Test
+import ru.skillbranch.kotlinexample.extensions.dropLastUntil
 
 
 /**
@@ -89,5 +90,15 @@ class ExampleUnitTest0 {
 //        println(users.toString())
     }
 
+///*Реализуй функцию расширения fun List.dropLastUntil(predicate: (T) -> Boolean): List ,
+//в качестве аргумента принимает предикат (лямбда выражение возвращающее Boolean) и возвращат список в котором исключены все элементы с конца до тех пор
+//пока не будет выполнено условие предиката (элемент соответствующий условию тоже должен быть исключен из результирующей коллекции)
+//(Пример: listOf(1, 2, 3).dropLastUntil{ it==2 } // [1]
+//"House Nymeros Martell of Sunspear".split(" ") .dropLastUntil{ it == "of" } // [House, Nymeros, Martell])*/
 
+    @Test
+    fun dropLastUntil_test() {
+        println(listOf(1, 2, 3).dropLastUntil{ it==2 })
+        println("House Nymeros Martell of Sunspear".split(" ") .dropLastUntil{ it == "of" })
+    }
 }
