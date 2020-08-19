@@ -1,15 +1,16 @@
-package ru.skillbranch.skillarticles.viewmodels
+package ru.skillbranch.skillarticles.viewmodels.base
 
+import android.os.Bundle
 import androidx.annotation.UiThread
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.*
 
-abstract class BaseViewModel<T>(initState: T) : ViewModel() {
+abstract class BaseViewModel<T : IViewModelState>(initState: T) : ViewModel() {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val notifications = MutableLiveData<Event<Notify>>()
 
     /***
-     * Инициализация начального состояния аргументом конструктора, и объявления состояния как
+     * Инициализация начального состояния аргументом конструктоа, и объявления состояния как
      * MediatorLiveData - медиатор исспользуется для того чтобы учитывать изменяемые данные модели
      * и обновлять состояние ViewModel исходя из полученных данных
      */
@@ -24,6 +25,7 @@ abstract class BaseViewModel<T>(initState: T) : ViewModel() {
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     val currentState
         get() = state.value!!
+
 
     /***
      * лямбда выражение принимает в качестве аргумента текущее состояние и возвращает
@@ -59,7 +61,8 @@ abstract class BaseViewModel<T>(initState: T) : ViewModel() {
      * реализует данное поведение с помощью EventObserver
      */
     fun observeNotifications(owner: LifecycleOwner, onNotify: (notification: Notify) -> Unit) {
-        notifications.observe(owner, EventObserver { onNotify(it) })
+        notifications.observe(owner,
+            EventObserver { onNotify(it) })
     }
 
     /***
@@ -75,15 +78,16 @@ abstract class BaseViewModel<T>(initState: T) : ViewModel() {
             state.value = onChanged(it, currentState) ?: return@addSource
         }
     }
-}
 
-class ViewModelFactory(private val params: String) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(ArticleViewModel::class.java)) {
-            return ArticleViewModel(params) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    fun saveState(outState: Bundle){
+        currentState.save(outState)
     }
+
+    @Suppress("UNCHECKED_CAST")
+    fun restoreState(savedState:Bundle){
+        state.value = currentState.restore(savedState) as T
+    }
+
 }
 
 class Event<out E>(private val content: E) {

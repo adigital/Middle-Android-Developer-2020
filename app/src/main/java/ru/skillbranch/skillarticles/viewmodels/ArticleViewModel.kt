@@ -1,6 +1,8 @@
 package ru.skillbranch.skillarticles.viewmodels
 
+import android.os.Bundle
 import android.util.Log
+import androidx.core.os.bundleOf
 import androidx.lifecycle.LiveData
 import ru.skillbranch.skillarticles.data.ArticleData
 import ru.skillbranch.skillarticles.data.ArticlePersonalInfo
@@ -8,22 +10,27 @@ import ru.skillbranch.skillarticles.data.repositories.ArticleRepository
 import ru.skillbranch.skillarticles.extensions.data.toAppSettings
 import ru.skillbranch.skillarticles.extensions.data.toArticlePersonalInfo
 import ru.skillbranch.skillarticles.extensions.format
+import ru.skillbranch.skillarticles.extensions.indexesOf
+import ru.skillbranch.skillarticles.viewmodels.base.BaseViewModel
+import ru.skillbranch.skillarticles.viewmodels.base.IViewModelState
+import ru.skillbranch.skillarticles.viewmodels.base.Notify
 
-class ArticleViewModel(private val articleId: String): BaseViewModel<ArticleState>(ArticleState()), IArticleViewModel {
+class ArticleViewModel(private val articleId: String) : BaseViewModel<ArticleState>(ArticleState()),
+    IArticleViewModel {
     private val repository = ArticleRepository
-    private var menuIsShown: Boolean = false
 
     init {
         //subscribe on mutable data
         subscribeOnDataSource(getArticleData()) { article, state ->
             article ?: return@subscribeOnDataSource null
+            Log.e("ArticleViewModel", "author: ${article.author}")
             state.copy(
                 shareLink = article.shareLink,
                 title = article.title,
-                author = article.author,
                 category = article.category,
                 categoryIcon = article.categoryIcon,
-                date = article.date.format()
+                date = article.date.format(),
+                author = article.author
             )
         }
 
@@ -65,21 +72,6 @@ class ArticleViewModel(private val articleId: String): BaseViewModel<ArticleStat
     //load text from db
     override fun getArticlePersonalInfo(): LiveData<ArticlePersonalInfo?> {
         return repository.loadArticlePersonalInfo(articleId)
-    }
-
-    //session state
-    override fun handleToggleMenu() {
-        updateState { state ->
-            state.copy(isShowMenu = !state.isShowMenu).also { menuIsShown = !state.isShowMenu }
-        }
-    }
-
-    override fun handleSearchMode(isSearch: Boolean) {
-        updateState { it.copy(isSearch = isSearch) }
-    }
-
-    override fun handleSearch(query: String?) {
-        updateState { it.copy(searchQuery = query) }
     }
 
     //app setting
@@ -133,20 +125,29 @@ class ArticleViewModel(private val articleId: String): BaseViewModel<ArticleStat
         notify(Notify.ErrorMessage(msg, "OK", null))
     }
 
-    fun hideMenu() {
-        updateState { it.copy(isShowMenu = false) }
+    //session state
+    override fun handleToggleMenu() {
+        updateState { it.copy(isShowMenu = !it.isShowMenu) }
     }
 
-    fun showMenu() {
-        updateState { it.copy(isShowMenu = menuIsShown) }
+    override fun handleSearchMode(isSearch: Boolean) {
+        updateState { it.copy(isSearch = isSearch, isShowMenu = false, searchPosition = 0) }
     }
 
-    fun handleSearchQuery(query: String?) {
-        updateState { it.copy(searchQuery = query) }
+    override fun handleSearch(query: String?) {
+        query ?: return
+        val result = (currentState.content.firstOrNull() as? String)
+            .indexesOf(query)
+            .map { it to it + query.length }
+        updateState { it.copy(searchQuery = query, searchResults = result, searchPosition = 0) }
     }
 
-    fun handleIsSearch(isSearch: Boolean) {
-        updateState { it.copy(isSearch = isSearch) }
+    fun handleUpResult() {
+        updateState { it.copy(searchPosition = it.searchPosition.dec()) }
+    }
+
+    fun handleDownResult() {
+        updateState { it.copy(searchPosition = it.searchPosition.inc()) }
     }
 }
 
@@ -154,10 +155,10 @@ data class ArticleState(
     val isAuth: Boolean = false, //пользователь авторизован
     val isLoadingContent: Boolean = true, //content загружается
     val isLoadingReviews: Boolean = true, //отзывы загружаются
-    val isLike: Boolean = false, //лайкнуто
+    val isLike: Boolean = false, //отмечено как Like
     val isBookmark: Boolean = false, //в закладках
-    val isShowMenu: Boolean = false,
-    val isBigText: Boolean = false,
+    val isShowMenu: Boolean = false, //отображается меню
+    val isBigText: Boolean = false, //шрифт увеличен
     val isDarkMode: Boolean = false, //темный режим
     val isSearch: Boolean = false, //режим поиска
     val searchQuery: String? = null, //поисковый запрос
@@ -171,5 +172,26 @@ data class ArticleState(
     val author: Any? = null,//автор статьи
     val poster: String? = null, //обложка статьи
     val content: List<Any> = emptyList(),//контент
-    val reviews: List<Any> = emptyList() //отзывы
-)
+    val reviews: List<Any> = emptyList() //комментарии
+) : IViewModelState {
+    override fun save(outState: Bundle) {
+        outState.putAll(
+            bundleOf(
+                "isSearch" to isSearch,
+                "searchQuery" to searchQuery,
+                "searchResults" to searchResults,
+                "searchPosition" to searchPosition
+            )
+        )
+    }
+
+    override fun restore(savedState: Bundle): ArticleState {
+        return copy(
+
+            isSearch = savedState["isSearch"] as Boolean,
+            searchQuery = savedState["searchQuery"] as? String,
+            searchResults = savedState["searchResults"] as List<Pair<Int, Int>>,
+            searchPosition = savedState["searchPosition"] as Int
+        )
+    }
+}
