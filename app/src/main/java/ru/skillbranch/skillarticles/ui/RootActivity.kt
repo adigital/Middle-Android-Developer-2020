@@ -234,7 +234,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
 
         private var isLoadingContent by ObserveProp(true)
 
-        private var isLiike: Boolean by RenderProp(false) { btn_like.isChecked = it }
+        private var isLike: Boolean by RenderProp(false) { btn_like.isChecked = it }
         private var isBookmark: Boolean by RenderProp(false) { btn_bookmark.isChecked = it }
         private var isShowMenu: Boolean by RenderProp(false) {
             btn_settings.isChecked = it
@@ -299,7 +299,7 @@ class RootActivity : BaseActivity<ArticleViewModel>(), IArticleView {
         override fun bind(data: IViewModelState) {
             data as ArticleState
 
-            isLiike = data.isLike
+            isLike = data.isLike
             isBookmark = data.isBookmark
             isShowMenu = data.isShowMenu
             isBigText = data.isBigText

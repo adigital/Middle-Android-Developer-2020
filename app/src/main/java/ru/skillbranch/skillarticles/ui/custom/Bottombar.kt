@@ -87,21 +87,29 @@ class Bottombar @JvmOverloads constructor(
     }
 
     fun bindSearchInfo(searchCount: Int = 0, position: Int = 0) {
-        if (searchCount == 0) {
-            tv_search_result.text = "Not found"
-            btn_result_up.isEnabled = false
-            btn_result_down.isEnabled = false
-        } else {
-            tv_search_result.text = "${position.inc()} of $searchCount"
-            btn_result_up.isEnabled = true
-            btn_result_down.isEnabled = true
-        }
+//        if (searchCount == 0) {
+//            tv_search_result.text = "Not found"
+//            btn_result_up.isEnabled = false
+//            btn_result_down.isEnabled = false
+//        } else {
+//            tv_search_result.text = "${position.inc()} of $searchCount"
+//            btn_result_up.isEnabled = true
+//            btn_result_down.isEnabled = true
+//        }
+//
+//        //lock button presses in min/max positions
+////        when (position) {
+////            0 -> btn_result_up.isEnabled = false
+////            searchCount - 1 -> btn_result_down.isEnabled = false
+////        }
+//        if (position == 0) btn_result_up.isEnabled = false
+//
+//        if (position == searchCount - 1) btn_result_down.isEnabled = false
+        tv_search_result.text = if (searchCount == 0) "Not found"
+        else "${position.inc()} of $searchCount"
 
-        //lock button presses in min/max positions
-        when (position) {
-            0 -> btn_result_up.isEnabled = false
-            searchCount - 1 -> btn_result_down.isEnabled = false
-        }
+        btn_result_up.isEnabled = (searchCount > 0) && position > 0
+        btn_result_down.isEnabled = (searchCount > 0) && position < searchCount - 1
     }
 
     private class SavedState : BaseSavedState, Parcelable {
