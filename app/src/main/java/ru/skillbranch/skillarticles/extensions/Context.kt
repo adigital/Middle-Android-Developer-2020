@@ -1,10 +1,13 @@
 package ru.skillbranch.skillarticles.extensions
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.util.TypedValue
+import androidx.core.content.ContextCompat
 
 fun Context.dpToPx(dp: Int): Float {
     return TypedValue.applyDimension(
@@ -36,3 +39,25 @@ val Context.isNetworkAvailable: Boolean
             cm.activeNetworkInfo?.run { isConnectedOrConnecting } ?: false
         }
     }
+
+//class AttrValue(@AttrRes private val res: Int) : ReadOnlyProperty<Context, Int> {
+//    private var value: Int? = null
+//    override fun getValue(thisRef: Context, property: KProperty<*>): Int {
+//        if (value == null) {
+//            val tv = TypedValue()
+//            if (thisRef.theme.resolveAttribute(res, tv, true)) value = tv.data
+//            else throw Resources.NotFoundException("Resource with id $res not found")
+//        }
+//        return value!!
+//    }
+//}
+
+fun Context.attrValue(res: Int): Int {
+    var value: Int = 0
+    val tv = TypedValue()
+
+    if (this.theme.resolveAttribute(res, tv, true)) value = tv.data
+    else throw Resources.NotFoundException("Resource with id $res not found")
+
+    return value
+}
