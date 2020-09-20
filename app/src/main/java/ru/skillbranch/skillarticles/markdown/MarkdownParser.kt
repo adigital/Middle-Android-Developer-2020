@@ -220,45 +220,44 @@ object MarkdownParser {
                 10 -> {
                     //text without "```{}```"
                     text = string.subSequence(startIndex.plus(3), endIndex.minus(3))
-                    val lines = text.split('\n')
-                    if (lines.size == 1) {
-                        val subelements = findElements(text)
-                        val element =
-                            Element.BlockCode(Element.BlockCode.Type.SINGLE, text, subelements)
-                        parents.add(element)
-                    } else
-                        lines.forEachIndexed { idx, line ->
-                            val type = when (idx) {
-                                0 -> Element.BlockCode.Type.START
-                                lines.size - 1 -> Element.BlockCode.Type.END
-                                else -> Element.BlockCode.Type.MIDDLE
-                            }
-                            val subelements = findElements(line)
-                            val element = Element.BlockCode(
-                                type,
-                                line + if (idx < lines.size.dec()) '\n' else "",
-                                subelements
-                            )
-                            parents.add(element)
-                            parents.add(Element.Text("\n"))
+                    val lines = text.split(LINE_SEPARATOR)
+                    val size = lines.size
 
+                    lines.forEachIndexed { index, line ->
+                        val elementType = when {
+                            size == 1 -> {
+                                text = line
+                                Element.BlockCode.Type.SINGLE
+                            }
+                            index == 0 -> {
+                                text = "$line$LINE_SEPARATOR"
+                                Element.BlockCode.Type.START
+                            }
+                            index == size.dec() -> {
+                                text = line
+                                Element.BlockCode.Type.END
+                            }
+                            index in 1..size.minus(2) -> {
+                                text = "$line$LINE_SEPARATOR"
+                                Element.BlockCode.Type.MIDDLE
+                            }
+                            else -> error("Out of index exception")
                         }
+                        val subElements = findElements(line)
+                        val element = Element.BlockCode(elementType, text, subElements)
+                        parents.add(element)
+                    }
                     lastStartIndex = endIndex
                 }
+
                 //NUMERIC LIST
                 11 -> {
-                    val reg = "^(\\d+\\.) ".toRegex().find(string.subSequence(startIndex, endIndex))
-                    val order = reg!!.groups[1]!!.value
-
-                    //text without "\\d+\\. "
-                    text = string.subSequence(startIndex.plus(reg!!.value.length), endIndex)
-
-                    //find inner elements
+                    val textWithOrder = string.subSequence(startIndex, endIndex)
+                    val order = "^[\\d]+[.]".toRegex().find(textWithOrder)!!.value
+                    text = textWithOrder.removeRange(0..order.length)
                     val subs = findElements(text)
                     val element = Element.OrderedListItem(order, text, subs)
                     parents.add(element)
-
-                    //next find start from position "endIndex" (last regex character)
                     lastStartIndex = endIndex
                 }
             }
