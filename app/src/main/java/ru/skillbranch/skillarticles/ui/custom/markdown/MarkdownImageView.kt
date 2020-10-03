@@ -201,7 +201,6 @@ class MarkdownImageView private constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
     public override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
-        super.dispatchDraw(canvas)
         canvas.drawLine(
             0f,
             linePositionY,

@@ -169,7 +169,9 @@ class MarkdownCodeView private constructor(
 
             iv_copy.layout(
                 right - iconSize,
-                iconHeight, right, iconHeight + iconSize
+                iconHeight,
+                right,
+                iconHeight + iconSize
             )
 
             iv_switch.layout(

@@ -50,7 +50,7 @@ class MarkdownTextView constructor(
             requestRectangleOnScreen(focusRect, false)
         }
         setTextColor(color)
-        textSize - fontSize
+        textSize = fontSize
         movementMethod = LinkMovementMethod.getInstance()
     }
 
