@@ -1,9 +1,12 @@
 package ru.skillbranch.skillarticles.ui.custom.markdown
 
 import android.content.Context
+import android.os.Parcel
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.ViewCompat
 import androidx.core.view.children
 import ru.skillbranch.skillarticles.data.repositories.MarkdownElement
 import ru.skillbranch.skillarticles.extensions.dpToIntPx
@@ -161,5 +164,52 @@ class MarkdownContentView @JvmOverloads constructor(
     fun setCopyListener(listener: (String) -> Unit) {
         children.filterIsInstance<MarkdownCodeView>()
             .forEach { it.copyListener = listener }
+    }
+
+    //save state
+    override fun onSaveInstanceState(): Parcelable? {
+        val savedState = SavedState(super.onSaveInstanceState())
+        if (ids.isEmpty()) {
+            children.forEach {
+                it.id = ViewCompat.generateViewId()
+                ids.add(it.id)
+            }
+        }
+        savedState.ssIds = ids
+        return savedState
+    }
+
+    //restore state
+    override fun onRestoreInstanceState(state: Parcelable) {
+        super.onRestoreInstanceState(state)
+        if (state is SavedState) {
+            ids = state.ssIds
+            children.forEachIndexed { index, view ->
+                view.id = ids[index]
+            }
+        }
+    }
+
+    private class SavedState : BaseSavedState, Parcelable {
+        var ssIds: ArrayList<Int> = arrayListOf()
+
+        constructor(superState: Parcelable?) : super(superState)
+
+        @Suppress("UNCHECKED_CAST")
+        constructor(src: Parcel) : super(src) {
+            ssIds = src.readArrayList(Int::class.java.classLoader) as ArrayList<Int>
+        }
+
+        override fun writeToParcel(dst: Parcel, flags: Int) {
+            super.writeToParcel(dst, flags)
+            dst.writeIntArray(ssIds.toIntArray())
+        }
+
+        override fun describeContents() = 0
+
+        companion object CREATOR : Parcelable.Creator<SavedState> {
+            override fun createFromParcel(parcel: Parcel) = SavedState(parcel)
+            override fun newArray(size: Int): Array<SavedState?> = arrayOfNulls(size)
+        }
     }
 }
