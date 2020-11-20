@@ -2,13 +2,14 @@ package ru.skillbranch.skillarticles.ui.custom
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Path
 import android.graphics.Typeface
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.setPadding
+import androidx.constraintlayout.widget.Barrier
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
