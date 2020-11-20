@@ -22,7 +22,7 @@ class ArticlesAdapter(private val listener: (ArticleItemData) -> Unit) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val containerView =
 //            LayoutInflater.from(parent.context).inflate(R.layout.item_article, parent, false) //from item_article.xml
-        ArticleItemView(parent.context) //from ArticleItemView.kt
+            ArticleItemView(parent.context) //from ArticleItemView.kt
         return ArticleVH(containerView)
     }
 
@@ -66,9 +66,9 @@ class ArticleDiffCallback : DiffUtil.ItemCallback<ArticleItemData>() {
 //        tv_author.text = item.author
 //        tv_title.text = item.title
 //        tv_description.text = item.description
-//        tv_likes_count.text = "S{item.likeCount}"
-//        tv_comments_count.text = "S{item.commentCount}"
-//        tv_read_duration.text = "S{item.readDuration} min read"
+//        tv_likes_count.text = "${item.likeCount}"
+//        tv_comments_count.text = "${item.commentCount}"
+//        tv_read_duration.text = "${item.readDuration} min read"
 //
 //        itemView.setOnClickListener { listener(item) }
 //    }

@@ -46,7 +46,8 @@ class ArticleItemView constructor(context: Context) : ViewGroup(context), Layout
     val primaryColor = context.attrValue(R.attr.colorPrimary)
 
     init {
-        this.setPadding(padding)
+        //this.setPadding(padding)
+        this.setPadding(padding, padding, padding, context.dpToIntPx(8))
 
         tv_date = TextView(context).apply {
             id = R.id.tv_date
@@ -173,7 +174,7 @@ class ArticleItemView constructor(context: Context) : ViewGroup(context), Layout
             paddingLeft + tv_date.measuredWidth,
             currentHeight + tv_date.measuredHeight
         )
-        paddingLeft += tv_date.right + padding
+        paddingLeft += tv_date.right// + padding
         tv_author.layout(
             paddingLeft,
             currentHeight,
