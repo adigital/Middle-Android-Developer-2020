@@ -26,16 +26,15 @@ fun Context.dpToIntPx(dp: Int): Int {
     ).toInt()
 }
 
-//fun Context.hideKeyboard(view: View) {
-//    val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-//    imm.hideSoftInputFromWindow(view.windowToken, 0)
-//}
-fun Activity.hideKeyboard(view: View?) {
-    val content = findViewById<View>(android.R.id.content)
-    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    imm.hideSoftInputFromWindow(content.windowToken, 0)
+fun Context.hideKeyboard(view: View) {
+    val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
+fun Context.showKeyboard(view: View) {
+    val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+}
 
 val Context.isNetworkAvailable: Boolean
     get() {
@@ -51,18 +50,6 @@ val Context.isNetworkAvailable: Boolean
             cm.activeNetworkInfo?.run { isConnectedOrConnecting } ?: false
         }
     }
-
-//class AttrValue(@AttrRes private val res: Int) : ReadOnlyProperty<Context, Int> {
-//    private var value: Int? = null
-//    override fun getValue(thisRef: Context, property: KProperty<*>): Int {
-//        if (value == null) {
-//            val tv = TypedValue()
-//            if (thisRef.theme.resolveAttribute(res, tv, true)) value = tv.data
-//            else throw Resources.NotFoundException("Resource with id $res not found")
-//        }
-//        return value!!
-//    }
-//}
 
 fun Context.attrValue(res: Int): Int {
     var value: Int = 0
