@@ -11,16 +11,15 @@ import ru.skillbranch.skillarticles.ui.custom.ArticleItemView
 class ArticlesAdapter(
     private val listener: (ArticleItemData) -> Unit,
     private val bookmarkListener: (articleId: String, isBookmark: Boolean) -> Unit
-) :
-    PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
+) : PagedListAdapter<ArticleItemData, ArticleVH>(ArticleDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleVH {
         val view = ArticleItemView(parent.context)
-        return ArticleVH(view)
+        return ArticleVH(view, bookmarkListener)
     }
 
     override fun onBindViewHolder(holder: ArticleVH, position: Int) {
-        holder.bind(getItem(position), listener, bookmarkListener)
+        holder.bind(getItem(position), listener)
     }
 }
 
@@ -32,14 +31,15 @@ class ArticleDiffCallback : DiffUtil.ItemCallback<ArticleItemData>() {
         oldItem == newItem
 }
 
-class ArticleVH(private val containerView: View) : RecyclerView.ViewHolder(containerView) {
-    fun bind(
-        item: ArticleItemData?,
-        listener: (ArticleItemData) -> Unit,
-        bookmarkListener: (articleId: String, isBookmark: Boolean) -> Unit
-    ) {
-        //if use placeholder item me be null
-        (containerView as ArticleItemView).bind(item!!, bookmarkListener)
-        itemView.setOnClickListener { listener(item!!) }
+class ArticleVH(
+    private val containerView: View,
+    private val bookmarkListener: (String, Boolean) -> Unit
+) : RecyclerView.ViewHolder(containerView) {
+    fun bind(item: ArticleItemData?, listener: (ArticleItemData) -> Unit) {
+
+        item?.let { notNullItem ->
+            (containerView as ArticleItemView).bind(notNullItem, bookmarkListener)
+            itemView.setOnClickListener { listener(notNullItem) }
+        }
     }
 }
